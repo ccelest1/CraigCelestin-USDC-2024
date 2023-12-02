@@ -11,21 +11,21 @@
 - input object: scannedTextObj
     * if default json object, use json.parse() (performs json -> js obj) and vice versa (js obj -> json) with json.stringify()
     *
-        ```json
-        [
-            {
-                "title" : string,
-                "isbn" : string,
-                "content":[
-                    {
-                    "page": int
-                    "line": int,
-                    "text": str
-                    }  (1) [ zero or more... ]
-                ],
-            }, (2) [ zero or more... ]
-        ]
-        ```
+    ```json
+    [
+        {
+            "title" : string,
+            "isbn" : string,
+            "content":[
+                {
+                "page": int
+                "line": int,
+                "text": str
+                }  (1) [ zero or more... ]
+            ],
+        }, (2) [ zero or more... ]
+    ]
+    ```
     - provided are two indicated instances of there being 0 or more objects
     - suggested is that there can be a list with 0 books, list with books that have no scanned content
     - other possible scenarios: object with a book that has multiple scanned content, objects with several books containing varying content

@@ -4,7 +4,9 @@
 ## Testing and Iteration
 ### Strategy for Writing Tests
 - need to write three kind of tests:
-    * positive (tests return match), negative (tests don't return matches), case-sensitive (tests that match for capitalization)
+    1. positive (tests return match)
+    2. negative (tests don't return matches)
+    3. case-sensitive (tests that match for capitalization)
 
 - Testing Strategies
     * Strategy 1
@@ -14,6 +16,6 @@
 
 ### Part of Solution I Am Most Proud About
 
-### Most difficult part of problem to solve
+### Most Difficult Part of Problem to Solve
 
 ### Edge Cases Addressed
