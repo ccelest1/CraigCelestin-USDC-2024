@@ -11,7 +11,7 @@
 - input object: scannedTextObj
     * if default json object, use json.parse() (performs json -> js obj) and vice versa (js obj -> json) with json.stringify()
     *
-    ```json
+    ```js
     [
         {
             "title" : string,
