@@ -1,6 +1,6 @@
 # findSearchTermInBooks
 
-Included in this repository are files to support candidates applying for software engineering roles through the GSA's U.S. Digital Corps program. 
+Included in this repository are files to support candidates applying for software engineering roles through the GSA's U.S. Digital Corps program.
 
 There are three files in this repository we would like you to focus on:
 
@@ -20,7 +20,7 @@ https://developer.chrome.com/docs/devtools/open/
 
 Either should work; we tested under both on Mac and Linux.
 
-You will submit both the HTML and JavaScript files when you are done. You should not need to edit `tester.html`. We expect all of your work to appear in the file `book_search.js`. 
+You will submit both the HTML and JavaScript files when you are done. You should not need to edit `tester.html`. We expect all of your work to appear in the file `book_search.js`.
 
 ## Submission
 
@@ -32,7 +32,7 @@ If you were remarkable technologists of years past, you might name your reposito
 
 `otisboykin-usdc-2023`
 
-or 
+or
 
 `mariebrown-usdc-2023`
 
