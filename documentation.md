@@ -23,3 +23,25 @@
 ### Most Difficult Part of Problem to Solve
 
 ### Edge Cases Addressed
+- (thought about how to handle edge case of multiple appearances) Wanted to think about a better way to display if Search Term is found on multiple pages or if there were multiple content lines provided per page
+    * so here are the alternative scenarios:
+        - search Term is found in same book, on the same page, on several lines
+                - the word and is found on page 31, line 12, 13, 14 -> can I do
+        ```js
+            {
+            "ISBN": "9780000528531",
+            "Page": 31
+            "Line": [12,13,14]
+            },
+        ```
+        - search Term is found on multiple pages on multiple lines
+        ```js
+        {
+            "ISBN": "9780000528531",
+            "Page(s)":
+                {
+                    31:[12,13],
+                    32:[11,14]
+                }
+        },
+        ```

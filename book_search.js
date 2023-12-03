@@ -27,10 +27,12 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         "Results": []
     };
     const ObjectLength = scannedTextObj.length
-    //check if 0 book objects
-    if (ObjectLength === 0) {
+
+    //check if 0 book objects, check if provided no search Term, provided no scannedTextObj
+    if (!scannedTextObj) {
         return result
     }
+
     // implement search helper function with defined types
     // using two pointers allows for a binary string search of O(n log n)
     /**
@@ -42,6 +44,7 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
     const search = (term, line_txt) => {
         let [l, r] = [0, line_txt.length]
         while (l < r) {
+            // accounted for case sensitivity with triple === boolean
             if (line_txt[l] === term || line_txt[r] === term) {
                 return true
             }
@@ -53,13 +56,14 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
     let ObjectPointer = 0
     while (ObjectPointer < ObjectLength) {
         if (ObjectLength == 1) {
-            // check if 0 pieces of scanned text: if there is 0 pieces and object only has 1 book, we know there can be no matches
             const ObjectContent = scannedTextObj[ObjectPointer]['Content']
+            // check if 0 pieces of scanned text: if there is 0 pieces and object only has 1 book, we know there can be no matches
             if (!ObjectContent) {
                 return result
             } else {
                 const ContentLength = ObjectContent.length
                 let ContentPointer = 0
+
                 // iterate through provided scanned content
                 while (ContentPointer < ContentLength) {
                     const ContentISBN = scannedTextObj[ObjectPointer]['ISBN']
@@ -88,11 +92,6 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         }
         ObjectPointer += 1
     }
-    // for (let i of scannedTextObj) {
-    //     console.log(i['Title'])
-    //     console.log(i['ISBN'])
-    //     console.log(i['Content'])
-    // }
     return result;
 }
 
@@ -167,4 +166,100 @@ if (test2result.Results.length == 1) {
     console.log("FAIL: Test 2");
     console.log("Expected:", twentyLeaguesOut.Results.length);
     console.log("Received:", test2result.Results.length);
+}
+
+/**
+ * Positive Test
+ */
+const test3Assert = {
+    "SearchTerm": "and",
+    "Results": [
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 9
+        },
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 10
+        }
+    ]
+}
+
+const test3a_result = findSearchTermInBooks('and', twentyLeaguesIn)
+if (JSON.stringify(test3Assert) === JSON.stringify(test3a_result)) {
+    console.log("PASS: Test 3a")
+} else {
+    console.log('FAIL: Test 3a')
+    console.log("Expected:", test3Assert);
+    console.log("Received:", test3a_result);
+}
+
+const test3b_result = findSearchTermInBooks("and", twentyLeaguesIn);
+if (test3b_result.Results.length == 2) {
+    console.log("PASS: Test 3b");
+} else {
+    console.log("FAIL: Test 3b");
+    console.log("Expected:", test3Assert.Results.length);
+    console.log("Received:", test3b_result.Results.length);
+}
+
+/**
+ * Negative Test
+ */
+
+const test4Assert = {
+    "SearchTerm": "blue",
+    "Results": []
+}
+
+const test4a_result = findSearchTermInBooks('blue', twentyLeaguesIn)
+if (JSON.stringify(test4Assert) === JSON.stringify(test4a_result)) {
+    console.log('PASS: Test 4a')
+} else {
+    console.log('FAIL: Test 4a')
+    console.log('Expected:', test4Assert)
+    console.log('Received:', test4a_result)
+}
+
+const test4b_result = findSearchTermInBooks('blue', twentyLeaguesIn);
+if (test4b_result.Results.length == 0) {
+    console.log("PASS: Test 4b");
+} else {
+    console.log("FAIL: Test 4b");
+    console.log("Expected:", test4Assert.Results.length);
+    console.log("Received:", test4b_result.Results.length);
+}
+
+/**
+ * Case-sensitive Test
+ */
+const test5Assert = {
+    'SearchTerm': 'The',
+    'Results': [
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 8
+        }
+    ]
+}
+
+const test5a_result = findSearchTermInBooks('The', twentyLeaguesIn);
+if (JSON.stringify(test5Assert) === JSON.stringify(test5a_result)) {
+    console.log('PASS: Test 5a')
+} else {
+    console.log('FAIL: Test 5a')
+    console.log('Expected:', test5Assert)
+    console.log('Received:', test5a_result)
+}
+
+const test5b_result = findSearchTermInBooks('The', twentyLeaguesIn);
+if (test5b_result.Results.length == 1) {
+    console.log("PASS: Test 5b");
+} else {
+    console.log("FAIL: Test 5b");
+    console.log("Expected:", test5Assert.Results.length);
+    console.log("Received:", test5b_result.Results.length);
 }
