@@ -7,7 +7,7 @@
 
 ## Testing and Iteration
 ### Strategy for Writing Tests
-- need to write three kind of tests:
+- wrote three types of tests
     1. positive (tests return match)
     2. negative (tests don't return matches)
     3. case-sensitive (tests that match for capitalization)
@@ -15,6 +15,34 @@
 - Testing Strategies
     * Strategy 1
     * Strategy 2
+    ```js
+    // multiple book object
+    // multiple book object with empty content
+    const multipleBooks = [
+    {
+        "Title": "Twenty Thousand Leagues Under the Sea",
+        "ISBN": "9780000528531",
+        "Content": [
+            {
+                "Page": 31,
+                "Line": 8,
+                "Text": "now simply went on by her own momentum.  The dark-"
+            },
+        ]
+    }
+    {
+        "Title": "Catcher in the Rye",
+        "ISBN": "9780000528531",
+        "Content": [
+            {
+                "Page": 200,
+                "Line": 15,
+                "Text": "the ocean was dark"
+            },
+        ]
+    }
+    ]
+    ```
 
 - __Making the Test Suite more Robust__
 

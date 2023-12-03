@@ -26,11 +26,11 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         "SearchTerm": `${searchTerm}`,
         "Results": []
     };
-    const ObjectLength = scannedTextObj.length
+    const ObjectLength = scannedTextObj.length;
 
     //check if 0 book objects, check if provided no search Term, provided no scannedTextObj
     if (!scannedTextObj) {
-        return result
+        return result;
     }
 
     // implement search helper function with defined types
@@ -42,55 +42,69 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
      * @returns {boolean}
      */
     const search = (term, line_txt) => {
-        let [l, r] = [0, line_txt.length]
+        let [l, r] = [0, line_txt.length];
         while (l < r) {
             // accounted for case sensitivity with triple === boolean
             if (line_txt[l] === term || line_txt[r] === term) {
-                return true
+                return true;
             }
-            l++
-            r--
+            l++;
+            r--;
         }
-        return false
+        return false;
     }
-    let ObjectPointer = 0
-    while (ObjectPointer < ObjectLength) {
-        if (ObjectLength == 1) {
-            const ObjectContent = scannedTextObj[ObjectPointer]['Content']
-            // check if 0 pieces of scanned text: if there is 0 pieces and object only has 1 book, we know there can be no matches
-            if (!ObjectContent) {
-                return result
-            } else {
-                const ContentLength = ObjectContent.length
-                let ContentPointer = 0
-
-                // iterate through provided scanned content
-                while (ContentPointer < ContentLength) {
-                    const ContentISBN = scannedTextObj[ObjectPointer]['ISBN']
-                    const ContentPage = ObjectContent[ContentPointer]['Page']
-                    const ContentLine = ObjectContent[ContentPointer]['Line']
-                    const LineText = ObjectContent[ContentPointer]['Text'].split(" ")
-                    if (search(searchTerm, LineText)) {
-                        result['Results'].push(
-                            {
-                                "ISBN": ContentISBN,
-                                "Page": ContentPage,
-                                "Line": ContentLine
-                            }
-                        )
-                    }
-                    ContentPointer += 1
-                }
+    const checkContent = (scanned_text, book_content, term_to_search) => {
+        const ContentLength = book_content.length;
+        let ContentPointer = 0;
+        // iterate through provided scanned content
+        while (ContentPointer < ContentLength) {
+            const ContentISBN = scannedTextObj[BookPointer]['ISBN'];
+            const ContentPage = book_content[ContentPointer]['Page'];
+            const ContentLine = book_content[ContentPointer]['Line'];
+            const LineText = book_content[ContentPointer]['Text'].split(" ");
+            let stripped = [];
+            // dark- edgecase
+            for (let i of LineText) {
+                i.replace('-', '');
+                stripped.push(i);
             }
+            if (search(term_to_search, stripped)) {
+                result['Results'].push(
+                    {
+                        "ISBN": ContentISBN,
+                        "Page": ContentPage,
+                        "Line": ContentLine
+                    }
+                );
+            }
+            ContentPointer += 1;
         }
+    }
+    let BookPointer = 0;
+    if (ObjectLength == 1) {
+        const BookContent = scannedTextObj[BookPointer]['Content'];
+        // check if 0 pieces of scanned text: if there is 0 pieces and object only has 1 book, we know there can be no matches
+        if (!BookContent) {
+            return result;
+        } else {
+            checkContent(scannedTextObj, BookContent, searchTerm);
+        }
+    }
+    while (BookPointer < ObjectLength) {
+        const BookContent = scannedTextObj[BookPointer]['Content'];
         if (ObjectLength > 1) {
             // for objects with more than 1 books
             /*
-                if we get to a book that has no content, we need to increment pointer or this can be performed recursively
-                or have 1 function that we call separately for content and one called for books
+                create separate function for finding content and then increment Book Pointer
             */
+            if (!BookContent) {
+                BookPointer += 1;
+            } else {
+                checkContent(scannedTextObj, BookContent, searchTerm);
+            }
         }
-        ObjectPointer += 1
+        // need this in order to skip to next book, if content not found in current book or searchTerm not found in current book
+        BookPointer += 1;
     }
     return result;
 }
@@ -187,11 +201,11 @@ const test3Assert = {
     ]
 }
 
-const test3a_result = findSearchTermInBooks('and', twentyLeaguesIn)
+const test3a_result = findSearchTermInBooks('and', twentyLeaguesIn);
 if (JSON.stringify(test3Assert) === JSON.stringify(test3a_result)) {
-    console.log("PASS: Test 3a")
+    console.log("PASS: Test 3a");
 } else {
-    console.log('FAIL: Test 3a')
+    console.log('FAIL: Test 3a');
     console.log("Expected:", test3Assert);
     console.log("Received:", test3a_result);
 }
@@ -214,13 +228,13 @@ const test4Assert = {
     "Results": []
 }
 
-const test4a_result = findSearchTermInBooks('blue', twentyLeaguesIn)
+const test4a_result = findSearchTermInBooks('blue', twentyLeaguesIn);
 if (JSON.stringify(test4Assert) === JSON.stringify(test4a_result)) {
-    console.log('PASS: Test 4a')
+    console.log('PASS: Test 4a');
 } else {
-    console.log('FAIL: Test 4a')
-    console.log('Expected:', test4Assert)
-    console.log('Received:', test4a_result)
+    console.log('FAIL: Test 4a');
+    console.log('Expected:', test4Assert);
+    console.log('Received:', test4a_result);
 }
 
 const test4b_result = findSearchTermInBooks('blue', twentyLeaguesIn);
@@ -248,11 +262,11 @@ const test5Assert = {
 
 const test5a_result = findSearchTermInBooks('The', twentyLeaguesIn);
 if (JSON.stringify(test5Assert) === JSON.stringify(test5a_result)) {
-    console.log('PASS: Test 5a')
+    console.log('PASS: Test 5a');
 } else {
-    console.log('FAIL: Test 5a')
-    console.log('Expected:', test5Assert)
-    console.log('Received:', test5a_result)
+    console.log('FAIL: Test 5a');
+    console.log('Expected:', test5Assert);
+    console.log('Received:', test5a_result);
 }
 
 const test5b_result = findSearchTermInBooks('The', twentyLeaguesIn);
@@ -263,3 +277,30 @@ if (test5b_result.Results.length == 1) {
     console.log("Expected:", test5Assert.Results.length);
     console.log("Received:", test5b_result.Results.length);
 }
+
+const multipleBooks = [
+    {
+        "Title": "Twenty Thousand Leagues Under the Sea",
+        "ISBN": "9780000528531",
+        "Content": [
+            {
+                "Page": 31,
+                "Line": 8,
+                "Text": "now simply went on by her own momentum.  The dark-"
+            },
+        ]
+    },
+    {
+        "Title": "Catcher in the Rye",
+        "ISBN": "320004038531",
+        "Content": [
+            {
+                "Page": 200,
+                "Line": 15,
+                "Text": "the ocean was dark"
+            },
+        ]
+    }
+]
+
+console.log(findSearchTermInBooks('dark', multipleBooks));
