@@ -26,7 +26,73 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         "SearchTerm": `${searchTerm}`,
         "Results": []
     };
-
+    const ObjectLength = scannedTextObj.length
+    //check if 0 book objects
+    if (ObjectLength === 0) {
+        return result
+    }
+    // implement search helper function with defined types
+    // using two pointers allows for a binary string search of O(n log n)
+    /**
+     *
+     * @param {string} term
+     * @param {string} line
+     * @returns {boolean}
+     */
+    const search = (term, line_txt) => {
+        let [l, r] = [0, line_txt.length]
+        while (l < r) {
+            if (line_txt[l] === term || line_txt[r] === term) {
+                return true
+            }
+            l++
+            r--
+        }
+        return false
+    }
+    let ObjectPointer = 0
+    while (ObjectPointer < ObjectLength) {
+        if (ObjectLength == 1) {
+            // check if 0 pieces of scanned text: if there is 0 pieces and object only has 1 book, we know there can be no matches
+            const ObjectContent = scannedTextObj[ObjectPointer]['Content']
+            if (!ObjectContent) {
+                return result
+            } else {
+                const ContentLength = ObjectContent.length
+                let ContentPointer = 0
+                // iterate through provided scanned content
+                while (ContentPointer < ContentLength) {
+                    const ContentISBN = scannedTextObj[ObjectPointer]['ISBN']
+                    const ContentPage = ObjectContent[ContentPointer]['Page']
+                    const ContentLine = ObjectContent[ContentPointer]['Line']
+                    const LineText = ObjectContent[ContentPointer]['Text'].split(" ")
+                    if (search(searchTerm, LineText)) {
+                        result['Results'].push(
+                            {
+                                "ISBN": ContentISBN,
+                                "Page": ContentPage,
+                                "Line": ContentLine
+                            }
+                        )
+                    }
+                    ContentPointer += 1
+                }
+            }
+        }
+        if (ObjectLength > 1) {
+            // for objects with more than 1 books
+            /*
+                if we get to a book that has no content, we need to increment pointer or this can be performed recursively
+                or have 1 function that we call separately for content and one called for books
+            */
+        }
+        ObjectPointer += 1
+    }
+    // for (let i of scannedTextObj) {
+    //     console.log(i['Title'])
+    //     console.log(i['ISBN'])
+    //     console.log(i['Content'])
+    // }
     return result;
 }
 

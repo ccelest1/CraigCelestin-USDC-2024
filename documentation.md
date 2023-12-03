@@ -1,5 +1,9 @@
 ## Overall Process and Decision Making
-
+- first steps were to break down problem based on assessment pdf instructions
+    * performed in book_search.md
+    * restate problem -> think of any possible questions -> id data structures -> think about assertions and edge cases -> pseudocode -> convert to js code -> walk through with test cases
+- understand required tests and potential paths
+    * understand that I am required to have three types of tests to confirm that my function is considering all potential inputs, outputs, and constraints: one of the most prominent being capitalization
 
 ## Testing and Iteration
 ### Strategy for Writing Tests
