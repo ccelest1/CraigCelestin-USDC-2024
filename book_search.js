@@ -88,50 +88,56 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
     }
     let BookPointer = 0;
     if (ObjectLength == 1) {
-        const Book = scannedTextObj[BookPointer]
+        const Book = scannedTextObj[BookPointer];
         if (Book) {
-            const BookISBN = Book['ISBN']
-            const BookContent = Book['Content'];
-            // check if 0 pieces of scanned text: if there is 0 pieces and object only has 1 book, we know there can be no matches
-            if (!BookContent) {
+            // not a valid book
+            if (!Book['Title'] || !Book['ISBN'] || !Book['Content']) {
                 return result;
             } else {
-                checkContent(BookISBN, BookContent, searchTerm);
+                const BookISBN = Book['ISBN']
+                const BookContent = Book['Content'];
+                // check if 0 pieces of scanned text: if there is 0 pieces and object only has 1 book, we know there can be no matches
+                if (!BookContent) {
+                    return result;
+                } else {
+                    checkContent(BookISBN, BookContent, searchTerm);
+                }
             }
+
         }
         // if the object has a length of 1 with no actual book i.e empty brackets there can be no match for a searchTerm
         if (!Book) {
-            return result
+            return result;
         }
     }
     if (ObjectLength > 1) {
         while (BookPointer < ObjectLength) {
-            const Book = scannedTextObj[BookPointer]
-            const BookISBN = Book['ISBN']
+            const Book = scannedTextObj[BookPointer];
             // skip if not a valid book instance, i.e. corrupted book that is missing essential information
             if (!Book['Title'] || !Book['ISBN'] || !Book['Content']) {
                 BookPointer += 1;
             } else {
-                let contentPointer = 0
+                const BookISBN = Book['ISBN'];
+                let contentPointer = 0;
                 const BookContent = Book['Content'];
                 // checking if content exists i.e. not an empty book
                 if (BookContent) {
-                    const BookContentLength = BookContent.length
-                    const currentContent = BookContent[contentPointer]
+                    const BookContentLength = BookContent.length;
+                    const currentContent = BookContent[contentPointer];
                     // checking if theres no empty content
                     if (currentContent) {
                         while (contentPointer < BookContentLength) {
-                            checkContent(BookISBN, BookContent, searchTerm)
+                            checkContent(BookISBN, BookContent, searchTerm);
                             // increment as we have checked current content
-                            contentPointer += 1
+                            contentPointer += 1;
                         }
                     } else {
                         // skip if we find empty content array
-                        contentPointer += 1
+                        contentPointer += 1;
                     }
                 }
                 // skip if there is no content
-                BookPointer += 1
+                BookPointer += 1;
             }
         }
     }
