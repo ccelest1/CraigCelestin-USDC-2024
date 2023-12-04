@@ -28,13 +28,13 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
     };
     const ObjectLength = scannedTextObj.length;
 
-    //check if 0 book objects, check if provided no search Term, provided no scannedTextObj
+    //check if provided no scannedTextObj
     if (!scannedTextObj) {
         return result;
     }
 
     // implement search helper function with defined types
-    // using two pointers allows for a binary string search of O(n log n)
+    // using two pointers allows for a quicker search
     /**
      *
      * @param {string} term
@@ -43,7 +43,7 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
      */
     const search = (term, line_txt) => {
         let [l, r] = [0, line_txt.length];
-        while (l < r) {
+        while (l <= r) {
             // accounted for case sensitivity with triple === boolean
             if (line_txt[l] === term || line_txt[r] === term) {
                 return true;
@@ -53,25 +53,26 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         }
         return false;
     }
-    const checkContent = (scanned_text, book_content, term_to_search) => {
+    const checkContent = (content_isbn, book_content, term_to_search) => {
         const ContentLength = book_content.length;
         let ContentPointer = 0;
         // iterate through provided scanned content
         while (ContentPointer < ContentLength) {
-            const ContentISBN = scannedTextObj[BookPointer]['ISBN'];
+            // understanding that we have a dictionary structure,
             const ContentPage = book_content[ContentPointer]['Page'];
             const ContentLine = book_content[ContentPointer]['Line'];
             const LineText = book_content[ContentPointer]['Text'].split(" ");
             let stripped = [];
-            // dark- edgecase
+            // account for words with hyphens like dark-
+            // regex expression using replace and g (global) flag
             for (let i of LineText) {
-                i.replace('-', '');
+                i = i.replace(/-/g, "")
                 stripped.push(i);
             }
             if (search(term_to_search, stripped)) {
                 result['Results'].push(
                     {
-                        "ISBN": ContentISBN,
+                        "ISBN": content_isbn,
                         "Page": ContentPage,
                         "Line": ContentLine
                     }
@@ -82,28 +83,50 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
     }
     let BookPointer = 0;
     if (ObjectLength == 1) {
-        const BookContent = scannedTextObj[BookPointer]['Content'];
-        // check if 0 pieces of scanned text: if there is 0 pieces and object only has 1 book, we know there can be no matches
-        if (!BookContent) {
-            return result;
-        } else {
-            checkContent(scannedTextObj, BookContent, searchTerm);
-        }
-    }
-    while (BookPointer < ObjectLength) {
-        const BookContent = scannedTextObj[BookPointer]['Content'];
-        if (ObjectLength > 1) {
-            // for objects with more than 1 books
-            /*
-                create separate function for finding content and then increment Book Pointer
-            */
+        const Book = scannedTextObj[BookPointer]
+        if (Book) {
+            const BookISBN = Book['ISBN']
+            const BookContent = Book['Content'];
+            // check if 0 pieces of scanned text: if there is 0 pieces and object only has 1 book, we know there can be no matches
             if (!BookContent) {
-                BookPointer += 1;
+                return result;
             } else {
-                checkContent(scannedTextObj, BookContent, searchTerm);
+                checkContent(BookISBN, BookContent, searchTerm);
             }
         }
-        // need this in order to skip to next book, if content not found in current book or searchTerm not found in current book
+        // if the object has a length of 1 with no actual book i.e empty brackets there can be no match for a searchTerm
+        if (!Book) {
+            return result
+        }
+    }
+    if (ObjectLength > 1) {
+        while (BookPointer < ObjectLength) {
+            const Book = scannedTextObj[BookPointer]
+            const BookISBN = Book['ISBN']
+            // checking if valid book instance
+            if (!Book['Title'] || !Book['ISBN'] || !Book['Content']) {
+                BookPointer += 1;
+            } else {
+                let contentPointer = 0
+                const BookContent = Book['Content'];
+                // checking if content exists i.e. not an empty book
+                if (BookContent) {
+                    const BookContentLength = BookContent.length
+                    const currentContent = BookContent[contentPointer]
+                    // checking if theres no empty content
+                    if (currentContent) {
+                        while (contentPointer < BookContentLength) {
+                            checkContent(BookISBN, BookContent, searchTerm)
+                            contentPointer += 1
+                        }
+                    } else {
+                        contentPointer += 1
+                    }
+                }
+                BookPointer += 1
+            }
+        }
+        // need this in order to skip to next book, if bracket that should contain book is empty
         BookPointer += 1;
     }
     return result;
@@ -278,6 +301,9 @@ if (test5b_result.Results.length == 1) {
     console.log("Received:", test5b_result.Results.length);
 }
 
+/**
+ * testing for searchTerm found in multiple books
+ */
 const multipleBooks = [
     {
         "Title": "Twenty Thousand Leagues Under the Sea",
@@ -292,7 +318,7 @@ const multipleBooks = [
     },
     {
         "Title": "Catcher in the Rye",
-        "ISBN": "320004038531",
+        "ISBN": "3200040385312",
         "Content": [
             {
                 "Page": 200,
@@ -303,4 +329,69 @@ const multipleBooks = [
     }
 ]
 
-console.log(findSearchTermInBooks('dark', multipleBooks));
+const test6Assert = {
+    'SearchTerm': 'dark',
+    'Results': [
+        { 'ISBN': '9780000528531', 'Page': 31, 'Line': 8 },
+        { 'ISBN': '3200040385312', 'Page': 200, 'Line': 15 }
+    ]
+}
+
+const test6a_result = findSearchTermInBooks('dark', multipleBooks);
+if (JSON.stringify(test6Assert) === JSON.stringify(test6a_result)) {
+    console.log('PASS: Test 6a');
+} else {
+    console.log('FAIL: Test 6a');
+    console.log('Expected:', test6Assert);
+    console.log('Received:', test6a_result);
+}
+
+const test6b_result = findSearchTermInBooks('dark', multipleBooks);
+if (test6b_result.Results.length == 2) {
+    console.log("PASS: Test 6b");
+} else {
+    console.log("FAIL: Test 6b");
+    console.log("Expected:", test6Assert.Results.length);
+    console.log("Received:", test6b_result.Results.length);
+}
+
+
+/*
+testing for multiple books, but one empty bracket where book would go
+*/
+const multipleBooks2 = [
+    {
+
+    },
+    {
+        "Title": "The Incredibles",
+        "ISBN": "132000323232",
+        "Content": [
+            {
+                "Page": 104,
+                "Line": 26,
+                "Text": "stop it elastigirl"
+            },
+        ]
+    }
+]
+
+const test7Assert = {
+    'SearchTerm': 'elastigirl',
+    'Results': [
+        { 'ISBN': '132000323232', 'Page': 104, 'Line': 26 }
+    ]
+}
+
+
+const test7a_result = findSearchTermInBooks('elastigirl', multipleBooks2);
+if (JSON.stringify(test7Assert) === JSON.stringify(test7a_result)) {
+    console.log('PASS: Test 6a');
+} else {
+    console.log('FAIL: Test 6a');
+    console.log('Expected:', test7Assert);
+    console.log('Received:', test7a_result);
+}
+
+
+const noBooks = []

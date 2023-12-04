@@ -16,8 +16,29 @@
     * Strategy 1
     * Strategy 2
     ```js
-    // multiple book object
-    // multiple book object with empty content
+    // pass first two provided tests using the search term 'the' and provided scanned Object content
+    /*
+        then i provided my own tests
+
+        the first being positive (test that would return a match)
+        I knew 'and' was present in two strings and it would be a extended testing of detecting strings
+
+
+    */
+    // list containing no books
+    // list with one book and no scanned content
+    // multiple books
+    // multiple books with one book containing empty content
+    // multiple books and one book having an empty content array and content arrays with content
+    // multiple books but one empty bracket where a book would theoretically go
+    // corrupted scanned book (missing isbn, title, content)
+    /*
+        books with lines that contain hyphens or non-alpha numeric
+        so theres a particular test case where
+        if a person wants to search for: searchTerm! or searchTerm
+        If they want exclusively, searchTerm and instances of searchTerm! don't count or they want exclusively searchTerm! and instances of searchTerm don't count it becomes tricky
+    */
+    // b
     const multipleBooks = [
     {
         "Title": "Twenty Thousand Leagues Under the Sea",
@@ -32,7 +53,7 @@
     }
     {
         "Title": "Catcher in the Rye",
-        "ISBN": "9780000528531",
+        "ISBN": "320004038531",
         "Content": [
             {
                 "Page": 200,

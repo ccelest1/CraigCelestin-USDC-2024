@@ -115,7 +115,7 @@
             - 'the' and 'THE' are not equivalent so use `===`
                 * `if searchTerm === `
     - Edge Cases
-        * words that aren't search term but contain term in it ex. searchTerm of 'the' and string 'then', provided a search term that is empty, an object containing no content, an object containing no books, if user inputs a non string input, if we have an object with multiple books and one of them has no pieces of scanned text e.g. the first book we get to has no scanned text -> navigate to next book (found match for SearchTerm), account for search term that has a hypen like 'dark-'
+        * words that aren't search term but contain term in it ex. searchTerm of 'the' and string 'then', provided a search term that is empty, an object containing no content, an object containing no books, if user inputs a non string input, if we have an object with multiple books and one of them has no pieces of scanned text e.g. the first book we get to has no scanned text -> navigate to next book (found match for SearchTerm), account for search term that has a hypen like 'dark-', what if a user wants to search for the number of spaces occurring in a solution
 
 ### Examples for Tests
 #### Example \#1
