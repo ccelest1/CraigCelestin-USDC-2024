@@ -58,27 +58,32 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         let ContentPointer = 0;
         // iterate through provided scanned content
         while (ContentPointer < ContentLength) {
-            // understanding that we have a dictionary structure,
-            const ContentPage = book_content[ContentPointer]['Page'];
-            const ContentLine = book_content[ContentPointer]['Line'];
-            const LineText = book_content[ContentPointer]['Text'].split(" ");
-            let stripped = [];
-            // account for words with hyphens like dark-
-            // regex expression using replace and g (global) flag
-            for (let i of LineText) {
-                i = i.replace(/-/g, "")
-                stripped.push(i);
+            // understanding that we have a dictionary structure and w want to make sure that the scanned content is valid
+            const ContentDict = book_content[ContentPointer]
+            if (!ContentDict['Page'] || !ContentDict['Line'] || !ContentDict['Text']) {
+                ContentPointer += 1
+            } else {
+                const ContentPage = ContentDict['Page'];
+                const ContentLine = ContentDict['Line'];
+                const LineText = ContentDict['Text'].split(" ");
+                let stripped = [];
+                // account for words with hyphens like dark-
+                // regex expression using replace and g (global) flag
+                for (let i of LineText) {
+                    i = i.replace(/-/g, "")
+                    stripped.push(i);
+                }
+                if (search(term_to_search, stripped)) {
+                    result['Results'].push(
+                        {
+                            "ISBN": content_isbn,
+                            "Page": ContentPage,
+                            "Line": ContentLine
+                        }
+                    );
+                }
+                ContentPointer += 1;
             }
-            if (search(term_to_search, stripped)) {
-                result['Results'].push(
-                    {
-                        "ISBN": content_isbn,
-                        "Page": ContentPage,
-                        "Line": ContentLine
-                    }
-                );
-            }
-            ContentPointer += 1;
         }
     }
     let BookPointer = 0;
@@ -103,7 +108,7 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         while (BookPointer < ObjectLength) {
             const Book = scannedTextObj[BookPointer]
             const BookISBN = Book['ISBN']
-            // checking if valid book instance
+            // skip if not a valid book instance, i.e. corrupted book that is missing essential information
             if (!Book['Title'] || !Book['ISBN'] || !Book['Content']) {
                 BookPointer += 1;
             } else {
@@ -117,17 +122,18 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
                     if (currentContent) {
                         while (contentPointer < BookContentLength) {
                             checkContent(BookISBN, BookContent, searchTerm)
+                            // increment as we have checked current content
                             contentPointer += 1
                         }
                     } else {
+                        // skip if we find empty content array
                         contentPointer += 1
                     }
                 }
+                // skip if there is no content
                 BookPointer += 1
             }
         }
-        // need this in order to skip to next book, if bracket that should contain book is empty
-        BookPointer += 1;
     }
     return result;
 }
@@ -302,6 +308,76 @@ if (test5b_result.Results.length == 1) {
 }
 
 /**
+ * noBooks search
+ */
+const noBooks = []
+const testAssertNoBooks = {
+    'SearchTerm': 'find',
+    'Results': []
+}
+
+const testnoBooksA = findSearchTermInBooks('find', noBooks);
+if (JSON.stringify(testAssertNoBooks) === JSON.stringify(testnoBooksA)) {
+    console.log('PASS: Test No Books A');
+} else {
+    console.log('FAIL: Test No Books A');
+    console.log('Expected:', testAssertNoBooks);
+    console.log('Received:', testnoBooksA);
+}
+const testnoBooksB_result = findSearchTermInBooks('find', noBooks);
+if (testnoBooksA.Results.length == 0) {
+    console.log("PASS: Test No Books B");
+} else {
+    console.log("FAIL: Test No Books B");
+    console.log("Expected:", testAssertNoBooks.Results.length);
+    console.log("Received:", testnoBooksB_result.Results.length);
+}
+
+const OneBookNoContent = [
+    {
+        "Title": "Twenty Thousand Leagues Under the Sea",
+        "ISBN": "9780000528531",
+        "Content": []
+    },
+    {
+        "Title": "Harry Potter",
+        "ISBN": "3200040385312",
+        "Content": [
+            {
+                "Page": 1400,
+                "Line": 105,
+                "Text": "I found the snitch !"
+            },
+        ]
+    }
+]
+
+const testAssertOneBookNoContent = {
+    'SearchTerm': 'snitch',
+    'Results': [
+        { 'ISBN': '3200040385312', 'Page': 1400, 'Line': 105 }
+    ]
+}
+
+const testOneBookNoContent_A = findSearchTermInBooks('snitch', OneBookNoContent);
+if (JSON.stringify(testAssertOneBookNoContent) === JSON.stringify(testOneBookNoContent_A)) {
+    console.log('PASS: Test OneBookNoScan A');
+} else {
+    console.log('FAIL: Test OneBookNoScan A');
+    console.log('Expected:', testAssertOneBookNoContent);
+    console.log('Received:', testOneBookNoContent_A);
+}
+const testOneBookNoContent_B = findSearchTermInBooks('find', noBooks);
+if (testOneBookNoContent_B.Results.length == 0) {
+    console.log("PASS: Test OneBookNoScan B");
+} else {
+    console.log("FAIL: Test OneBookNoScan B");
+    console.log("Expected:", testAssertOneBookNoContent.Results.length);
+    console.log("Received:", testOneBookNoContent_B.Results.length);
+}
+
+
+/**
  * testing for searchTerm found in multiple books
  */
 const multipleBooks = [
@@ -329,7 +405,7 @@ const multipleBooks = [
     }
 ]
 
-const test6Assert = {
+const testAssertMultiple = {
     'SearchTerm': 'dark',
     'Results': [
         { 'ISBN': '9780000528531', 'Page': 31, 'Line': 8 },
@@ -338,11 +414,11 @@ const test6Assert = {
 }
 
 const test6a_result = findSearchTermInBooks('dark', multipleBooks);
-if (JSON.stringify(test6Assert) === JSON.stringify(test6a_result)) {
+if (JSON.stringify(testAssertMultiple) === JSON.stringify(test6a_result)) {
     console.log('PASS: Test 6a');
 } else {
     console.log('FAIL: Test 6a');
-    console.log('Expected:', test6Assert);
+    console.log('Expected:', testAssertMultiple);
     console.log('Received:', test6a_result);
 }
 
@@ -351,7 +427,7 @@ if (test6b_result.Results.length == 2) {
     console.log("PASS: Test 6b");
 } else {
     console.log("FAIL: Test 6b");
-    console.log("Expected:", test6Assert.Results.length);
+    console.log("Expected:", testAssertMultiple.Results.length);
     console.log("Received:", test6b_result.Results.length);
 }
 
@@ -386,12 +462,17 @@ const test7Assert = {
 
 const test7a_result = findSearchTermInBooks('elastigirl', multipleBooks2);
 if (JSON.stringify(test7Assert) === JSON.stringify(test7a_result)) {
-    console.log('PASS: Test 6a');
+    console.log('PASS: Test 7a');
 } else {
-    console.log('FAIL: Test 6a');
+    console.log('FAIL: Test 7a');
     console.log('Expected:', test7Assert);
     console.log('Received:', test7a_result);
 }
-
-
-const noBooks = []
+const test7b_result = findSearchTermInBooks('elastigirl', multipleBooks2);
+if (test7b_result.Results.length == 1) {
+    console.log("PASS: Test 7b");
+} else {
+    console.log("FAIL: Test 7b");
+    console.log("Expected:", test7Assert.Results.length);
+    console.log("Received:", test7b_result.Results.length);
+}
