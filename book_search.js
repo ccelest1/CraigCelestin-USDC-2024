@@ -47,14 +47,21 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
      *
      * @param {string} term
      * @param {string} line
-     * @returns {boolean}
+     * @returns {dict}
      */
-    const search = (term, line_txt) => {
-        let [l, r] = [0, line_txt.length];
+    const search = (term, content_isbn, stripped, ContentPage, ContentLine) => {
+        // console.log(stripped)
+        let [l, r] = [0, stripped.length - 1];
         while (l <= r) {
             // accounted for case sensitivity with triple === boolean
-            if (line_txt[l] === term || line_txt[r] === term) {
-                return true;
+            if (stripped[l] === term || stripped[r] === term) {
+                result['Results'].push(
+                    {
+                        "ISBN": content_isbn,
+                        "Page": ContentPage,
+                        "Line": ContentLine
+                    }
+                );
             }
             l++;
             r--;
@@ -87,17 +94,9 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
                     i = i.replace(/[- .]/g, "")
                     stripped.push(i);
                 }
-                if (search(term_to_search, stripped)) {
-                    result['Results'].push(
-                        {
-                            "ISBN": content_isbn,
-                            "Page": ContentPage,
-                            "Line": ContentLine
-                        }
-                    );
-                }
-                ContentPointer += 1;
+                search(term_to_search, content_isbn, stripped, ContentPage, ContentLine)
             }
+            ContentPointer += 1;
         }
     }
     let BookPointer = 0;
@@ -532,4 +531,59 @@ if (JSON.stringify(testAssertMissingISBn) === JSON.stringify(testmissingISBN)) {
     console.log('FAIL: Test isbn');
     console.log('Expected:', testAssertMissingISBn);
     console.log('Received:', testmissingISBN);
+}
+
+/**
+ * testing mentions of multiple occurrences of searchTerm on same line in multiple books
+ */
+
+const multipleOccurences = [
+    {
+        "Title": "Book1",
+        "ISBN": "10987000054321",
+        "Content": [
+            {
+                "Page": 31,
+                "Line": 8,
+                "Text": "can i do this? i can do this"
+            },
+        ]
+    },
+    {
+        "Title": "Book2",
+        "ISBN": "3200040385312",
+        "Content": [
+            {
+                "Page": 200,
+                "Line": 15,
+                "Text": "he can do it. he knows he can"
+            },
+        ]
+    }
+]
+
+const AssertMultipleReturn = {
+    'SearchTerm': 'can',
+    'Results': [
+        {
+            'ISBN': '10987000054321',
+            'Page': 31,
+            'Line': 8
+        },
+        {
+            'ISBN': '10987000054321',
+            'Page': 31, 'Line': 8
+        },
+        { 'ISBN': '3200040385312', 'Page': 200, 'Line': 15 },
+        { 'ISBN': '3200040385312', 'Page': 200, 'Line': 15 }
+    ]
+}
+
+const testmultipleReturn = findSearchTermInBooks('can', multipleOccurences);
+if (JSON.stringify(AssertMultipleReturn) === JSON.stringify(testmultipleReturn)) {
+    console.log('PASS: Test return multiple');
+} else {
+    console.log('FAIL: Test multiple return');
+    console.log('Expected:', testAssertMultiple);
+    console.log('Received:', testmultipleReturn);
 }
