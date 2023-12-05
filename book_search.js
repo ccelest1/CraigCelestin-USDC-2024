@@ -29,7 +29,15 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
     const ObjectLength = scannedTextObj.length;
 
     //check if provided no scannedTextObj
-    if (!scannedTextObj) {
+    const inputSearchType = typeof searchTerm
+
+    // break if non string inputted
+    if (inputSearchType !== 'string') {
+        console.log('please enter a string to search')
+        return
+    }
+    // if empty scannedtext or searchTerm input
+    if (!scannedTextObj || !searchTerm) {
         return result;
     }
 
@@ -53,6 +61,12 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         }
         return false;
     }
+    /**
+     * @param {string} content_isbn
+     * @param {dict} book_content
+     * @param {string} term_to_search
+     * @returns {dict}
+     */
     const checkContent = (content_isbn, book_content, term_to_search) => {
         const ContentLength = book_content.length;
         let ContentPointer = 0;
@@ -70,7 +84,7 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
                 // account for words with hyphens like dark-
                 // regex expression using replace and g (global) flag
                 for (let i of LineText) {
-                    i = i.replace(/-/g, "")
+                    i = i.replace(/[- .]/g, "")
                     stripped.push(i);
                 }
                 if (search(term_to_search, stripped)) {
@@ -90,7 +104,7 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
     if (ObjectLength == 1) {
         const Book = scannedTextObj[BookPointer];
         if (Book) {
-            // not a valid book
+            // not a valid book if these are not found
             if (!Book['Title'] || !Book['ISBN'] || !Book['Content']) {
                 return result;
             } else {
@@ -316,7 +330,7 @@ if (test5b_result.Results.length == 1) {
 /**
  * noBooks search
  */
-const noBooks = []
+const noBooks = {}
 const testAssertNoBooks = {
     'SearchTerm': 'find',
     'Results': []
@@ -339,6 +353,9 @@ if (testnoBooksA.Results.length == 0) {
     console.log("Received:", testnoBooksB_result.Results.length);
 }
 
+/**
+ * one book with no content edge case
+ */
 const OneBookNoContent = [
     {
         "Title": "Twenty Thousand Leagues Under the Sea",
@@ -352,7 +369,7 @@ const OneBookNoContent = [
             {
                 "Page": 1400,
                 "Line": 105,
-                "Text": "I found the snitch !"
+                "Text": "I found the snitch."
             },
         ]
     }
@@ -373,8 +390,8 @@ if (JSON.stringify(testAssertOneBookNoContent) === JSON.stringify(testOneBookNoC
     console.log('Expected:', testAssertOneBookNoContent);
     console.log('Received:', testOneBookNoContent_A);
 }
-const testOneBookNoContent_B = findSearchTermInBooks('find', noBooks);
-if (testOneBookNoContent_B.Results.length == 0) {
+const testOneBookNoContent_B = findSearchTermInBooks('snitch', OneBookNoContent);
+if (testOneBookNoContent_B.Results.length == 1) {
     console.log("PASS: Test OneBookNoScan B");
 } else {
     console.log("FAIL: Test OneBookNoScan B");
@@ -481,4 +498,38 @@ if (test7b_result.Results.length == 1) {
     console.log("FAIL: Test 7b");
     console.log("Expected:", test7Assert.Results.length);
     console.log("Received:", test7b_result.Results.length);
+}
+
+/*
+    missing isbn so expected should just be empty results array even though there is a match
+*/
+const missingISBN = [
+    {
+
+    },
+    {
+        "Title": "The Incredibles",
+        "Content": [
+            {
+                "Page": 104,
+                "Line": 26,
+                "Text": "stop it elastigirl"
+            },
+        ]
+    }
+]
+
+
+const testAssertMissingISBn = {
+    'SearchTerm': 'elastigirl',
+    'Results': []
+}
+
+const testmissingISBN = findSearchTermInBooks('elastigirl', missingISBN);
+if (JSON.stringify(testAssertMissingISBn) === JSON.stringify(testmissingISBN)) {
+    console.log('PASS: Test missing isbn');
+} else {
+    console.log('FAIL: Test isbn');
+    console.log('Expected:', testAssertMissingISBn);
+    console.log('Received:', testmissingISBN);
 }

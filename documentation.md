@@ -55,7 +55,6 @@
         so theres a particular test case where
         if a person wants to search for: searchTerm! or searchTerm
         If they want exclusively, searchTerm and instances of searchTerm! don't count or they want exclusively searchTerm! and instances of searchTerm don't count it becomes tricky
-
         for this particular implementation
 
         I believe a theoretical solution would be to have a stack implementation
@@ -72,7 +71,7 @@
 
         or for the value pairs themselves they are being scanned improperly and have missing values or errors in text, in a really extended and technical solution we can check to see if the values make sense i.e do the pages and lines make sense in regards to the book found in an online db and does the text make grammatical and structural sense (are there words that don't make sense)
     */
-    //
+    // example of several books
     const multipleBooks = [
     {
         "Title": "Twenty Thousand Leagues Under the Sea",
