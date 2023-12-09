@@ -50,7 +50,6 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
      * @returns {dict}
      */
     const search = (term, content_isbn, stripped, ContentPage, ContentLine) => {
-        // console.log(stripped)
         let [l, r] = [0, stripped.length - 1];
         while (l <= r) {
             // accounted for case sensitivity with triple === boolean
