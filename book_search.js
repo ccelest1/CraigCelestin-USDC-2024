@@ -28,7 +28,7 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
     };
     const ObjectLength = scannedTextObj.length;
 
-    //check if provided no scannedTextObj
+    //check type for input of searchTerm
     const inputSearchType = typeof searchTerm
 
     // break if non string inputted
