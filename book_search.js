@@ -583,6 +583,6 @@ if (JSON.stringify(AssertMultipleReturn) === JSON.stringify(testmultipleReturn))
     console.log('PASS: Test return multiple');
 } else {
     console.log('FAIL: Test multiple return');
-    console.log('Expected:', testAssertMultiple);
+    console.log('Expected:', AssertMultipleReturn);
     console.log('Received:', testmultipleReturn);
 }
